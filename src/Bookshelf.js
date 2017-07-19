@@ -1,6 +1,10 @@
 import React from 'react'
 import Book from './Book'
 
+/**
+* @description Bookshelf component.
+* @param {object} props - Contains the bookshelf name, handleUpdate function, and the book list
+*/
 const Bookshelf = (props) => {
   return (
     <div className="bookshelf">
@@ -8,7 +12,7 @@ const Bookshelf = (props) => {
       <div className="bookshelf-books">
         <ol className="books-grid">
           {props.bookList.map((book, index) => {
-            return <li key={index}><Book data={book}/></li>
+            return <li key={index}><Book data={book} bookshelf={props.name} handleUpdate={props.handleUpdate}/></li>
           })}
         </ol>
       </div>
