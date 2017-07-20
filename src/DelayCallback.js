@@ -7,5 +7,5 @@ var timeout = null;
 */
 export const inputDelay = (value, callback) => {
   clearTimeout(timeout)
-  timeout = setTimeout(() => callback(value), 500)
+  timeout = setTimeout(() => callback(value), 300)
 };

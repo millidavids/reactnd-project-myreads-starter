@@ -12,7 +12,7 @@ const Bookshelf = (props) => {
       <div className="bookshelf-books">
         <ol className="books-grid">
           {props.bookList.map((book, index) => {
-            return <li key={index}><Book data={book} bookshelf={props.name} handleUpdate={props.handleUpdate}/></li>
+            return <li key={index}><Book data={book} handleChange={props.handleUpdate}/></li>
           })}
         </ol>
       </div>

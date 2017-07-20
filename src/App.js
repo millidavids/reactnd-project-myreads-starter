@@ -34,23 +34,12 @@ class App extends React.Component {
   * @param {object} newShelf - Contains the bookshelf where the new book should be put
   */
   handleAdd = (bookToAdd, newShelf) => {
-    const bookMatch = this.state.allBooks.find((book) => book.id === bookToAdd.id)
-    if (newShelf !== 'none') {
-      if(typeof bookMatch === 'undefined') {
-        BooksAPI.update(bookToAdd, newShelf).then((result) => {
-          if (result[newShelf].includes(bookToAdd.id)) {
-            bookToAdd.shelf = newShelf
-            this.setState((prevState) => ({
-              allBooks: prevState.allBooks.concat([bookToAdd])
-            }))
-          }
-        })
-      } else if (bookMatch.shelf !== newShelf) {
-        this.handleUpdate(bookToAdd, newShelf)
-      }
-    } else if (typeof bookMatch !== 'undefined') {
-      this.handleUpdate(bookToAdd, newShelf)
-    }
+    BooksAPI.update(bookToAdd, newShelf).then((result) => {
+      bookToAdd.shelf = newShelf
+      this.setState((prevState) => ({
+        allBooks: prevState.allBooks.concat([bookToAdd])
+      }))
+    })
   }
 
   /**
@@ -60,25 +49,12 @@ class App extends React.Component {
   */
   handleUpdate = (bookToUpdate, newShelf) => {
     BooksAPI.update(bookToUpdate, newShelf).then((result) => {
-      if (newShelf === 'none') {
-        this.setState((prevState) => ({
-          allBooks: prevState.allBooks.map((book) => {
-            if (book.id === bookToUpdate.id) {
-              bookToUpdate.shelf = newShelf
-              return bookToUpdate
-            } else {
-              return book
-            }
-          })
-        }))
-      } else if (result[newShelf].includes(bookToUpdate.id)) {
-        bookToUpdate.shelf = newShelf
-        this.setState((prevState) => ({
-          allBooks: prevState.allBooks.map((book) => {
-            return book.id === bookToUpdate.id ? bookToUpdate : book
-          })
-        }))
-      }
+      this.setState((prevState) => {
+        prevState.allBooks[prevState.allBooks.indexOf(bookToUpdate)].shelf = newShelf
+        return({
+          allBooks: prevState.allBooks
+        })
+      })
     })
   }
 
@@ -110,7 +86,11 @@ class App extends React.Component {
           </div>
         )}/>
         <Route exact path='/search' render={() => (
-          <BookSearch shelvedBooks={this.state.allBooks} handleUpdate={this.handleAdd}/>
+          <BookSearch
+            shelvedBooks={this.state.allBooks}
+            handleUpdate={this.handleUpdate}
+            handleAdd={this.handleAdd}
+          />
         )}/>
       </div>
     )

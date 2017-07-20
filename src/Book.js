@@ -10,8 +10,8 @@ const Book = (props) => {
       <div className="book-top">
         <div className="book-cover" style={{ width: 128, height: 193, backgroundImage: `url(${props.data.imageLinks.smallThumbnail})` }}></div>
         <div className="book-shelf-changer">
-          <select value={props.data.shelf || 'none'} onChange={(e) => props.handleUpdate(props.data, e.target.value)}>
-            <option value="none" disabled>Move to...</option>
+          <select value={props.data.shelf} onChange={(e) => props.handleChange(props.data, e.target.value)}>
+            <option value="moveTo" disabled>Move to...</option>
             <option value="currentlyReading">Currently Reading</option>
             <option value="wantToRead">Want to Read</option>
             <option value="read">Read</option>

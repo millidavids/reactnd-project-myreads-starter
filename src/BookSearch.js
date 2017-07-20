@@ -11,7 +11,8 @@ import * as DelayCallback from './DelayCallback'
 */
 class BookSearch extends React.Component {
   static propTypes = {
-    handleUpdate: PropTypes.func.isRequired
+    handleUpdate: PropTypes.func.isRequired,
+    shelvedBooks: PropTypes.array.isRequired
   }
 
   state = {
@@ -33,32 +34,32 @@ class BookSearch extends React.Component {
   /**
   * @description Updates the list of books to display on the search page
   * @param {string} value -  The value used to send to the BooksAPI to query
+  *
+  * To note, I hate this function, but I had to implement safeguards because the
+  * BooksAPI.search function does not standardize on a return object. Sometimes
+  * it is an array, sometimes it is an object, and it will error out if you pass
+  * it an empty string.
   */
   updateBookList = (value) => {
-    if (value.length > 0) {
-      BooksAPI.search(value).then((result) => {
-        if ("items" in result) {
-          this.setState({
-            bookList: []
-          })
-        } else {
-          this.setState({
-            bookList: result.map((book) => {
-              let existingBook = this.props.shelvedBooks.find((shelvedBook) => shelvedBook.id === book.id)
-              if (typeof existingBook !== 'undefined') {
-                return existingBook
-              } else {
-                return book
-              }
-            })
-          })
-        }
-      })
-    } else {
+    if (value === '') {
       this.setState({
         bookList: []
       })
+      return
     }
+    BooksAPI.search(value).then((result) => {
+      if (result.error === 'empty query') {
+        this.setState({
+          bookList: []
+        })
+        return
+      }
+      this.setState({
+        bookList: result.map((searchedBook) => (
+          this.props.shelvedBooks.find((book) => book.id === searchedBook.id) || searchedBook
+        ))
+      })
+    })
   }
 
   render = () => {
@@ -78,7 +79,13 @@ class BookSearch extends React.Component {
         <div className="search-books-results">
           <ol className="books-grid">
             {this.state.bookList.length !== 0 && (this.state.bookList.map((book, index) => {
-              return <li key={index}><Book bookshelf={book.shelf} data={book} handleUpdate={this.props.handleUpdate}/></li>
+              return (
+                <li key={index}>
+                  <Book
+                    data={book}
+                    handleChange={this.props.shelvedBooks.indexOf(book) === -1 ? this.props.handleAdd : this.props.handleUpdate}
+                  />
+                </li>)
             }))}
           </ol>
         </div>
